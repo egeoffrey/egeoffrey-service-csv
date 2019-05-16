@@ -1,0 +1,10 @@
+package: myhouse-service-csv
+release: 1
+version: development
+git: myhouse-project/myhouse-service-csv
+modules:
+  - service/csv
+default_config:
+  - service/mqtt:
+      hostname: myhouse-gateway
+      port: 1883
