@@ -18,6 +18,8 @@ import time
 import json
 
 from sdk.module.service import Service
+import sdk.utils.exceptions as exception
+from sdk.utils.datetimeutils import DateTimeUtils
 
 import sdk.utils.web
 
@@ -26,6 +28,8 @@ class Csv(Service):
     def on_init(self):
         # helpers
         self.date = None
+        # require configuration before starting up
+        self.add_configuration_listener("house", True)
         
     # What to do when running
     def on_start(self):
@@ -57,7 +61,7 @@ class Csv(Service):
                 if csv_file.startswith("http://") or csv_file.startswith("https://"):
                     # if the filename is a url retrieve the data
                     try:
-                        data = json.dumps(sdk.utils.web.get(csv_file))
+                        data = json.dumps(sdk.utils.web.get(csv_file).split("\n"))
                     except Exception,e: 
                         self.log_error("unable to connect to "+csv_file+": "+exception.get(e))
                         return
@@ -68,26 +72,34 @@ class Csv(Service):
                     file.close()
                 self.cache.add(cache_key, data)
             message.reply()
+            data = json.loads(data)
             # parse the file
+            self.log_debug("file "+csv_file+" has "+str(len(data))+" lines")
+            line_number = 0
             for line in data:
-                message.clear()
-                entry = line.split(',')
-                # if a filter is defined, ignore the line if the filter is not found
-                if filter is not None and entry[filter_position+1] != filter: continue
-                # if a prefix is defined, filter based on it
-                if "prefix" is not None and not entry[value_position+1].startswith(prefix): continue
-                # generate the timestamp
-                if "date_position" is not None:
-                    date = datetime.datetime.strptime(entry[date_position+1], date_format)
-                    message.set("timestamp", self.date.timezone(self.date.timezone(int(time.mktime(date.timetuple())))))
-                # strip out the measure from the value
-                value = entry[value_position+1]
-                # if a measure prefix was defined, remove it
-                if "prefix" is not None: value.replace(prefix, "")
-                # set the value
-                message.set("value", value)
-                # send the response back
-                self.send(message)
+                line_number = line_number+1
+                try: 
+                    message.clear()
+                    entry = line.split(',')
+                    # if a filter is defined, ignore the line if the filter is not found
+                    if filter is not None and entry[filter_position-1] != filter: continue
+                    # if a prefix is defined, filter based on it
+                    if prefix is not None and not entry[value_position-1].startswith(prefix): continue
+                    # generate the timestamp
+                    if "date_position" is not None:
+                        date = datetime.datetime.strptime(entry[date_position-1], date_format)
+                        message.set("timestamp", self.date.timezone(self.date.timezone(int(time.mktime(date.timetuple())))))
+                    # strip out the measure from the value
+                    value = entry[value_position-1]
+                    # if a measure prefix was defined, remove it
+                    if prefix is not None: value.replace(prefix, "")
+                    # set the value
+                    message.set("value", value)
+                    # send the response back
+                    self.send(message)
+                except Exception,e: 
+                    self.log_warning("unable to parse line "+str(line_number)+", skipping: "+exception.get(e))
+                    continue
 
     # What to do when receiving a new/updated configuration for this module    
     def on_configuration(self,message):
