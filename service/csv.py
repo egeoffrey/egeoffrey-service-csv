@@ -17,11 +17,11 @@ import datetime
 import time
 import json
 
-from sdk.module.service import Service
-import sdk.utils.exceptions as exception
-from sdk.utils.datetimeutils import DateTimeUtils
+from sdk.python.module.service import Service
+import sdk.python.utils.exceptions as exception
+from sdk.python.utils.datetimeutils import DateTimeUtils
 
-import sdk.utils.web
+import sdk.python.utils.web
 
 class Csv(Service):
     # What to do when initializing
@@ -61,7 +61,7 @@ class Csv(Service):
                 if csv_file.startswith("http://") or csv_file.startswith("https://"):
                     # if the filename is a url retrieve the data
                     try:
-                        data = json.dumps(sdk.utils.web.get(csv_file).split("\n"))
+                        data = json.dumps(sdk.python.utils.web.get(csv_file).split("\n"))
                     except Exception,e: 
                         self.log_error("unable to connect to "+csv_file+": "+exception.get(e))
                         return
