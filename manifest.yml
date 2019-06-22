@@ -1,6 +1,9 @@
 package: myhouse-service-csv
-revision: 3
+revision: 4
 version: development
-git: myhouse-project/myhouse-service-csv
+github: myhouse-project/myhouse-service-csv
+dockerhub: myhouse-project/myhouse-service-csv
+description: Retrieve values from a csv file
+tags: service csv
 modules:
   - service/csv
