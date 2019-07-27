@@ -29,7 +29,7 @@ class Csv(Service):
         # helpers
         self.date = None
         # require configuration before starting up
-        self.add_configuration_listener("house", True)
+        self.add_configuration_listener("house", 1, True)
         
     # What to do when running
     def on_start(self):
@@ -104,6 +104,6 @@ class Csv(Service):
     # What to do when receiving a new/updated configuration for this module    
     def on_configuration(self,message):
         # we need house timezone for querying the database
-        if message.args == "house":
-            if not self.is_valid_module_configuration(["timezone"], message.get_data()): return False
+        if message.args == "house" and not message.is_null:
+            if not self.is_valid_configuration(["timezone"], message.get_data()): return False
             self.date = DateTimeUtils(message.get("timezone"))
