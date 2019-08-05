@@ -2,6 +2,7 @@ branch: development
 description: Retrieve values from a csv file
 dockerhub: myhouseproject/myhouse-service-csv
 github: myhouse-project/myhouse-service-csv
+icon: file-csv
 manifest_schema: 2
 modules:
 - service/csv:
@@ -40,6 +41,6 @@ modules:
         name: prefix
         required: false
 package: myhouse-service-csv
-revision: 6
+revision: 7
 tags: service csv
 version: 1.0
