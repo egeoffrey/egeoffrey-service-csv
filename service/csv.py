@@ -26,10 +26,7 @@ import sdk.python.utils.web
 class Csv(Service):
     # What to do when initializing
     def on_init(self):
-        # helpers
-        self.date = None
-        # require configuration before starting up
-        self.add_configuration_listener("house", 1, True)
+        pass
         
     # What to do when running
     def on_start(self):
@@ -88,7 +85,7 @@ class Csv(Service):
                     # generate the timestamp
                     if "date_position" is not None:
                         date = datetime.datetime.strptime(entry[date_position-1], date_format)
-                        message.set("timestamp", self.date.timezone(self.date.timezone(int(time.mktime(date.timetuple())))))
+                        message.set("timestamp", int(time.mktime(date.timetuple())))
                     # strip out the measure from the value
                     value = entry[value_position-1]
                     # if a measure prefix was defined, remove it
@@ -103,7 +100,4 @@ class Csv(Service):
 
     # What to do when receiving a new/updated configuration for this module    
     def on_configuration(self,message):
-        # we need house timezone for querying the database
-        if message.args == "house" and not message.is_null:
-            if not self.is_valid_configuration(["timezone"], message.get_data()): return False
-            self.date = DateTimeUtils(message.get("timezone"))
+        pass
