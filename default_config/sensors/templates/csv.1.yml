@@ -9,7 +9,7 @@ service:
     value_position: 9
     date_position: 6
     date_format: "%Y%m%d"
-  mode: active
+  mode: pull
   name: csv
   schedule:
     days: 1
